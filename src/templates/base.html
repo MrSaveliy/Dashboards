@@ -1,137 +1,72 @@
-<!-- templates/base.html -->
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Поиск DFO по датам</title>
-    <!-- Подключаем Chart.js -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дашборды</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='css/base.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        .form-group { margin: 10px 0; }
-        label { margin-right: 10px; }
-        input[type="date"] { padding: 5px; }
-        button { padding: 8px 16px; background: #007bff; color: white; border: none; cursor: pointer; }
-        button:hover { background: #0056b3; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-        th { background-color: #f4f4f4; }
-        .error { color: red; margin: 10px 0; }
-        .info { color: green; margin: 10px 0; }
-        .chart-container {
-            margin-top: 30px;
-            max-width: 800px;
-            height: 400px;
-        }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 </head>
-<body>
-    <h1>Поиск данных DFO по диапазону дат</h1>
-
-    <!-- Форма поиска -->
-    <form method="get" action="/dfo-results">
-        <div class="form-group">
-            <label for="batch_date_start">Начальная дата:</label>
-            <input 
-                type="date" 
-                name="batch_date_start" 
-                id="batch_date_start" 
-                value="{{ batch_date_start }}"
-                required>
-            
-            <label for="batch_date_end">Конечная дата:</label>
-            <input 
-                type="date" 
-                name="batch_date_end" 
-                id="batch_date_end" 
-                value="{{ batch_date_end }}"
-                required>
-            
-            <button type="submit">🔍 Поиск</button>
-        </div>
-    </form>
-
-    <!-- Ошибки -->
-    {% if error %}
-        <div class="error"><strong>Ошибка:</strong> {{ error }}</div>
-    {% endif %}
-
-    <!-- Результаты -->
-    {% if info %}
-        {% if results_found %}
-            <div class="info">Найдено записей: {{ info | length }}</div>
-
-            <!-- Таблица -->
-            <table>
-                <thead>
-                    <tr>
-                        <th>Дата</th>
-                        <th>Значение</th>
-                        <!-- Добавьте другие поля при необходимости -->
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for row in info %}
-                    <tr>
-                        <td>{{ row.batch_date }}</td>
-                        <td>{{ row.value }}</td> <!-- Убедитесь, что у вас есть поле `value` -->
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-
-            <!-- Контейнер для графика -->
-            <div class="chart-container">
-                <canvas id="dfoChart"></canvas>
+<body> 
+    <header>
+        <div id="header">
+            <div id="header-title"> 
+                <h1>Дашборды</h1>
             </div>
+            <div id="header-dashboard-list">
+                <ul >
+                    <a href="http://127.0.0.1:8000/pages/dfo" class="btn">Дашборд ДФО</a>
+                    <a href="http://127.0.0.1:8000/pages/centr" class="btn">Дашборд Центр</a>
+                    <a href="http://127.0.0.1:8000/pages/siberia" class="btn">Дашборд Сибирь</a>
+                </ul>
+            </div>  
+        </div>
+        <h2>Дашборд ДФО — График по датам</h2>
+        <div>
+            <label for="start-date">Start date:</label>
+                <input
+                    type="date"
+                    id="start-date"
+                    name="batch_date_start"
+                    value="{{ request.query_params.get('batch_date_start', '') }}"
+                />
 
-            <!-- Скрипт построения графика -->
-            <script>
-                const ctx = document.getElementById('dfoChart').getContext('2d');
+                <label for="end-date">End date:</label>
+                <input
+                    type="date"
+                    id="end-date"
+                    name="batch_date_end"
+                    value="{{ request.query_params.get('batch_date_end', '') }}"
+                />
 
-                // Подготовка данных
-                const dates = [{% for row in info %}"{{ row.batch_date }}",{% endfor %}];
-                const values = [{% for row in info %}{{ row.value }},{% endfor %}];
+                <div id="header-dashboard-list">
+                    <a id="search-link" href="#" class="btn">Поиск</a>
+                </div>
 
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: dates,
-                        datasets: [{
-                            label: 'Значение DFO',
-                            data: values,
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                            borderWidth: 2,
-                            pointRadius: 4,
-                            tension: 0.3  // плавные линии
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: { position: 'top' },
-                            title: {
-                                display: true,
-                                text: 'DFO по датам'
-                            }
-                        },
-                        scales: {
-                            x: {
-                                title: { display: true, text: 'Дата' }
-                            },
-                            y: {
-                                title: { display: true, text: 'Значение' },
-                                beginAtZero: false
-                            }
-                        }
+                <script>
+                    function updateSearchLink() {
+                        const startDate = document.getElementById('start-date').value;
+                        const endDate = document.getElementById('end-date').value;
+                        let url = new URL("http://localhost:8000/pages/dfo/search/");
+                        if (startDate) url.searchParams.append("batch_date_start", startDate);
+                        if (endDate) url.searchParams.append("batch_date_end", endDate);
+                        document.getElementById('search-link').href = url;
                     }
-                });
-            </script>
-        {% else %}
-            <p><em>Данные за выбранный период не найдены.</em></p>
-        {% endif %}
-    {% endif %}
 
+                    // Обновляем ссылку при изменении дат
+                    document.getElementById('start-date').addEventListener('change', updateSearchLink);
+                    document.getElementById('end-date').addEventListener('change', updateSearchLink);
+
+                    // Инициализация при загрузке
+                    updateSearchLink();
+                </script>                
+        </div>    
+    </header>
+    <main>
+            {% block content %}
+            {% endblock %}
+    </main>
 </body>
 </html>
+
