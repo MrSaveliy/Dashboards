@@ -1,0 +1,8 @@
+.env
+/venv
+/migrations
+/__pycache__
+__init__.py
+test.py
+alembic.ini
+/init-scripts

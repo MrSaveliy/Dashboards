@@ -1,0 +1,41 @@
+services:
+  db-postgres:
+    image: postgres:latest
+    container_name: "db-postgres"
+    restart: always
+    environment:
+      POSTGRES_DB: "Dashboards"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_HOST: "localhost"
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init-scripts:/docker-entrypoint-initdb.d  # Автоматическое выполнение SQL-скриптов при инициализации
+    networks:
+      - custom
+
+  db_oracle:
+    image: gvenzl/oracle-xe:21-slim
+    container_name: oracle-xe
+    environment:
+      - ORACLE_PASSWORD=oracle123
+      - APP_USER=user        # Пароль для пользователя SYS и SYSTEM
+      - ORACLE_MEMORY_SIZE=2048     # Опционально: размер памяти в МБ
+      - APP_USER_PASSWORD=user
+    ports:
+      - "1521:1521"                  # Порт для подключения к базе
+      - "5500:5500"                  # Порт для Oracle EM Express
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+      - ./init-scripts:/docker-entrypoint-initdb.d  # Опционально: скрипты инициализации
+    restart: unless-stopped
+    shm_size: "1gb"                 # Обязательно для Oracle
+
+
+networks:
+  custom:
+    driver: bridge
+
+volumes: 
+  oracle-data:   
