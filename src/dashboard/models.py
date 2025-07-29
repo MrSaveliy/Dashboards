@@ -4,7 +4,7 @@ from database.postgres.postgres import Base
 metadata = MetaData()
 
 class INFO_DFO(Base):
-    __tablename__ = "INFO_DFO", 
+    __tablename__ = "info_dfo", 
     metadata,
     id = Column(Integer, primary_key=True)
     batch_name = Column(String, unique=False)
@@ -13,7 +13,7 @@ class INFO_DFO(Base):
     batch_sla  = Column(String, unique=False)
 
 info_dfo= Table (
-    "INFO_DFO", 
+    "info_dfo", 
     metadata,
     Column("id", Integer, primary_key=True),
     Column("batch_name", String),

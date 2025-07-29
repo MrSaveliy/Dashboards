@@ -28,13 +28,11 @@ async def get_dfo_by_date_range(batch_date_start: str, batch_date_end: str, sess
             )
         return info
     except HTTPException as ex:
-        # Пробрасываем HTTPException дальше (важно!)
         raise ex
-    except Exception as e:
-        # Ловим любые другие ошибки
+    except Exception as ex:
         raise HTTPException(
             status_code=500,
-            detail=f"Неожиданная ошибка на сервере: {str(e)}"
+            detail=f"Неожиданная ошибка на сервере: {str(ex)}"
         )     
 
 # --hand for oracle

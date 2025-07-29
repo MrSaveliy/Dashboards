@@ -1,28 +1,48 @@
+/* Обнуляем отступы и устанавливаем box-sizing */
 * {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
+/* Полная высота страницы */
+html, body {
+  height: 100%;
+  font-family: Arial, sans-serif;
+}
+
+/* Основной контейнер — делаем flex-контейнером */
 body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    margin-top: 50px;
-    background-color: #f4f4f4;
-    justify-content: center; /* горизонтальное выравнивание */
-    align-items: center;     /* вертикальное выравнивание */           /* высота всей страницы */
+  display: flex;
+  flex-direction: column;
 }
 
+/* Шапка — фиксированная высота или авто */
 header {
-    text-align: center; 
-    justify-content: center; /* горизонтальное выравнивание */
-    align-items: center;
+  background-color: #44a546;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  flex-shrink: 0; /* Не сжимается */
+  height: 30vh;
 }
+
+/* Основное содержимое — занимает всё свободное пространство */
+main {
+  flex: 1; /* Занимает всё доступное пространство */
+  padding: 2rem;
+  background-color: #f4f4f4;
+  min-height: 70vh; /* Минимум половина экрана */
+}
+
+/* Подвал — всегда внизу */
+
 .btn {
     display: inline-block;
     padding: 12px 24px;
     margin: 10px;
-    background-color: #3d7e31;
-    color: white;
+    background-color: #ffffff;
+    color: rgb(0, 0, 0);
     text-decoration: none;
     border-radius: 6px;
     font-size: 16px;
@@ -38,8 +58,4 @@ header {
     transform: translateY(-2px);
 }
 
-main {
-    width: 1000px;
-    margin-left: 650px;
-}
 
