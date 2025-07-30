@@ -16,6 +16,7 @@ body {
 
 /* Шапка — фиксированная высота или авто */
 header {
+  display: grid;
   box-sizing: border-box;
   width: 100%;
   height: 30vh;
@@ -78,6 +79,8 @@ canvas {
     cursor: pointer;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     transition: background-color 0.3s ease;
+    min-width: 120px;
+    min-height: 40px;
 }
 
 .btn:hover {
