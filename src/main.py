@@ -18,31 +18,39 @@ app.include_router(router_dashboard)
 # === ОБРАБОТЧИК ОШИБОК ===
 @app.exception_handler(StarletteHTTPException)
 async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
+    # Для 404 возвращаем свою страницу
     if exc.status_code == 404:
         return templates.TemplateResponse(
             "error_404.html",
             {"request": request},
             status_code=404
         )
-    return await http_exception_handler(request, exc)
+    # Для других HTTP-ошибок можно сделать универсальную страницу
+    return templates.TemplateResponse(
+        "error_http.html",
+        {"request": request, "status_code": exc.status_code, "detail": exc.detail},
+        status_code=exc.status_code
+    )
+
 
 @app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: StarletteHTTPException):
-    if exc.status_code == 422:
-        return await templates.TemplateResponse(
-            "error_422.html",
-            { "request": request},
-            status_code=422
-        )
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    # Страница для ошибок валидации (422)
+    return templates.TemplateResponse(
+        "error_422.html",
+        {"request": request, "errors": exc.errors()},
+        status_code=422
+    )
+
 
 @app.exception_handler(Exception)
-async def unhandled_exception_handler(request: Request, exc: StarletteHTTPException):
-    if exc.status_code == 500:
-        return await templates.TemplateResponse(
-            "error_500.html",
-            {"request": request},
-            status_code=500
-        )
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    # Все непредусмотренные ошибки выдаем страницу 500
+    return templates.TemplateResponse(
+        "error_500.html",
+        {"request": request, "error": str(exc)},
+        status_code=500
+    )
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

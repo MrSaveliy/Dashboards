@@ -14,14 +14,11 @@
 <body> 
     <header>
         <div id="header">
-            <div id="header-title"> 
-                <h1>Дашборды</h1>
-            </div>
             <div id="header-dashboard-list">
                 <ul >
                     <a href="http://127.0.0.1:8000/pages/dfo" class="btn">ДФО</a>
                     <a href="http://127.0.0.1:8000/pages/centr" class="btn">Центр</a>
-                    <a href="http://127.0.0.1:8000/pages/siberia" class="btn">SСибирь</a>
+                    <a href="http://127.0.0.1:8000/pages/siberia" class="btn">Сибирь</a>
                 </ul>
             </div>  
         </div>
@@ -66,9 +63,9 @@
                 </script>                
         </div>    
     </header>
-    <main> 
-    {% block content %}   
-    {% endblock %}
+    <main id="main"> 
+        {% block content %}   
+        {% endblock %}
     </main>
 </body>
 </html>
