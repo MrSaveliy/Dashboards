@@ -20,15 +20,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // --- Подготовка данных ---
   const data = info.map(item => {
-    const [hours, minutes] = item.batch_time.split(":");
-    const date = new Date(1970, 0, 1, parseInt(hours), parseInt(minutes));
+    const [hours, minutes] = item.batch_time.split(":").map(Number);
+
+    // Используем базовую дату 1970-01-01
+    let date = new Date(1970, 0, 1, hours, minutes);
+
+    // Если время меньше 3:00, переносим дату на следующий день
+    if (hours < 3) {
+      date.setDate(date.getDate() + 1);
+    }
+
     return {
       x: item.batch_date,
       y: date
     };
   });
 
-  const thresholdTime = new Date(1970, 0, 1, 5, 0); // 5:00
+  const thresholdTime = new Date(1970, 0, 1, 5, 0);
+  thresholdTime.setDate(thresholdTime.getDate() + 0); // 5:00 остаётся в пределах 1-го числа
 
   const ctx = document.getElementById('timeChart').getContext('2d');
   new Chart(ctx, {
@@ -55,12 +64,12 @@ document.addEventListener("DOMContentLoaded", function () {
     },
     options: {
       responsive: true,
-      maintainAspectRatio: false,  
+      maintainAspectRatio: false,
       plugins: {
         legend: { position: 'top' },
         tooltip: {
           callbacks: {
-            label: function(context) {
+            label: function (context) {
               const d = context.parsed;
               const date = new Date(d.y);
               const hours = date.getHours().toString().padStart(2, '0');
@@ -115,17 +124,18 @@ document.addEventListener("DOMContentLoaded", function () {
           type: 'time',
           time: {
             unit: 'minute',
-            displayFormats: { minute: 'HH:mm' }
+            displayFormats: { minute: 'HH:mm' },
+            tooltipFormat: 'HH:mm'
           },
           title: {
             display: true,
             text: 'Время'
           },
-          min: new Date(1970, 0, 1, 3, 0),
-          max: new Date(1970, 0, 1, 7, 0),
+          min: new Date(1970, 0, 1, 22, 0),
+          max: new Date(1970, 0, 2, 2, 0),
           ticks: {
-            stepSize: 20,
-            callback: function(value) {
+            stepSize: 30,
+            callback: function (value) {
               const date = new Date(value);
               const hours = date.getHours().toString().padStart(2, '0');
               const minutes = date.getMinutes().toString().padStart(2, '0');
